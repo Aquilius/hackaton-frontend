@@ -38,13 +38,13 @@
 	<link rel="stylesheet" href="css/simple-line-icons.css">
 	<!-- Owl Carousel -->
 	<link rel="stylesheet" href="css/owl.carousel.min.css">
+
 	<link rel="stylesheet" href="css/owl.theme.default.min.css">
 	<!-- Bootstrap  -->
 	<link rel="stylesheet" href="css/bootstrap.css">
-
-
 	<link rel="stylesheet" href="css/style.css">
 
+    <link rel="manifest" href="/manifest.json">
 
 	<!-- Modernizr JS -->
 	<script src="js/modernizr-2.6.2.min.js"></script>
@@ -62,7 +62,7 @@
 
 		        <div class="navbar-header">
 		        	<!-- Mobile Toggle Menu Button -->
-                    
+
 					<a href="#" class="js-fh5co-nav-toggle fh5co-nav-toggle" data-toggle="collapse" data-target="#navbar" aria-expanded="false" aria-controls="navbar"><i></i></a>
 		          	<a class="navbar-brand" href="index.html"><img src="images/pocketsync.png" width="200px"></a>
 		        </div>
@@ -509,6 +509,24 @@
 	<script src="js/owl.carousel.min.js"></script>
 	<!-- Main JS (Do not remove) -->
 	<script src="js/main.js"></script>
+
+    <!-- Uncomment the line below when ready to test with fake data -->
+    <script src="https://www.gstatic.com/firebasejs/4.6.2/firebase.js"></script>
+    <script src="https://www.gstatic.com/firebasejs/4.6.2/firebase-app.js"></script>
+    <script src="https://www.gstatic.com/firebasejs/4.6.2/firebase-messaging.js"></script>
+    <script>
+        // Initialize Firebase
+        var config = {
+            apiKey: "AIzaSyByG5S6FVkZgyctUN32TDJUVN66KNWK8BA",
+            authDomain: "pwa-2-oxid.firebaseapp.com",
+            databaseURL: "https://pwa-2-oxid.firebaseio.com",
+            projectId: "pwa-2-oxid",
+            storageBucket: "pwa-2-oxid.appspot.com",
+            messagingSenderId: "102546754306"
+        };
+        firebase.initializeApp(config);
+    </script>
+    <script src="js/app.js" async></script>
 
 	</body>
 </html>
