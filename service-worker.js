@@ -34,9 +34,16 @@ self.addEventListener('activate', function (e) {
 });
 
 self.addEventListener('push', function(event) {
-    console.log('[Service Worker] Push Received.');
-    console.log(`[Service Worker] Push had this data: "${event.data.text()}"`);
+    //console.log('[Service Worker] Push Received.');
+    //console.log(`[Service Worker] Push had this data: "${event.data.text()}"`);
 
+    self.clients.matchAll().then(function(clients) {
+        clients.forEach(function(client) {
+            client.postMessage({
+                msg: "Hey I just got a fetch from you!"
+            });
+        });
+    });
 
 
     const title = 'Push Codelab';
