@@ -7,10 +7,6 @@
     const pushButton = document.querySelector('.js-push-btn');
     const messaging = firebase.messaging();
 
-    /*jQuery(window).on('pushReceived', function(event) {
-        console.log(event);
-    });*/
-
     var app = {
         user: '',
         accessToken: {
@@ -23,7 +19,6 @@
     {
         jQuery('article').hide();
         jQuery('article#' + name).show();
-
     };
 
 
@@ -31,7 +26,9 @@
     {
         var username = jQuery('.login form #inputEmail').val();
         app.user = username;
-        jQuery('.login form input').attr('disable', 'disable');
+        //jQuery('.login form input').attr('disable', 'disable');
+
+        app.showScreen('dashboard');
 
         return false;
     };
@@ -184,7 +181,7 @@
 
 
 
-    jQuery('.login form').submit(app.onLoginSubmit());
+    jQuery('.login form').on('submit', app.onLoginSubmit);
 
     if ('serviceWorker' in navigator && 'PushManager' in window) {
         console.log('Service Worker and Push is supported');
@@ -208,7 +205,5 @@
         console.warn('Push messaging is not supported');
         pushButton.textContent = 'Push Not Supported';
     }
-
-
 
 })();
