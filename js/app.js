@@ -14,64 +14,59 @@
 
     app.getAccessToken = function()
     {
-        var now = + new Date();
-        if (app.accessToken.validTill > now) {
-            return app.accessToken.accessToken;
-        } else {
-            var response = app.requestAccessTokenFromServer();
+        return new Promise(function(resolve, reject)
+        {
+            var now = +new Date();
+            if (app.accessToken.validTill > now) {
+                console.log('has this');
+                resolve(app.accessToken.accessToken);
+            } else {
+                var req = new XMLHttpRequest();
+                var urlEncodedData = "";
+                var urlEncodedDataPairs = [];
+                var name;
+                var data = {
+                    'grant_type': 'client_credentials',
+                    'client_id': '1_2ow9v1mswgowsw48sk4wwsk04s0c0sgs8os8ksc8wwsok08ccw',
+                    'client_secret': '2dsk4j8lqbtwckc8gg88w88gss40o400kw4c40w88c4k8c0k4w'
+                };
+                for(name in data) {
+                    urlEncodedDataPairs.push(encodeURIComponent(name) + '=' + encodeURIComponent(data[name]));
+                }
+                urlEncodedData = urlEncodedDataPairs.join('&').replace(/%20/g, '+');
 
-            console.log(response);
-            //app.accessToken.accessToken =
+                // Do the usual XHR stuff
+                req.open('POST', 'http://auth.codecommerce.de/oauth/v2/token');
+                req.setRequestHeader('Content-Type', 'application/x-www-form-urlencoded');
 
-            return app.accessToken.accessToken;
-        }
-    };
+                req.onload = function() {
+                    // This is called even on 404 etc
+                    // so check the status
+                    if (req.status == 200) {
+                        // Resolve the promise with the response text
+                        var response = JSON.parse(req.response);
+                        app.accessToken.accessToken = response.access_token;
+                        app.accessToken.validTill = +new Date() + response.expires_in;
+                        resolve(app.accessToken.accessToken);
+                    } else {
+                        // Otherwise reject with the status text
+                        // which will hopefully be a meaningful error
+                        reject(Error(req.statusText));
+                    }
+                };
 
-    app.requestAccessTokenFromServer = function()
-    {
-        return new Promise(function(resolve, reject) {
+                // Handle network errors
+                req.onerror = function() {
+                    reject(Error("Network Error"));
+                };
 
-            var req = new XMLHttpRequest();
-            var urlEncodedData = "";
-            var urlEncodedDataPairs = [];
-            var name;
-            var data = {
-                'grant_type': 'client_credentials',
-                'client_id': '1_2ow9v1mswgowsw48sk4wwsk04s0c0sgs8os8ksc8wwsok08ccw',
-                'client_secret': '2dsk4j8lqbtwckc8gg88w88gss40o400kw4c40w88c4k8c0k4w'
-            };
-            for(name in data) {
-                urlEncodedDataPairs.push(encodeURIComponent(name) + '=' + encodeURIComponent(data[name]));
+                console.log('need this');
+                // Make the request
+                req.send(urlEncodedData);
             }
-            urlEncodedData = urlEncodedDataPairs.join('&').replace(/%20/g, '+');
-
-            // Do the usual XHR stuff
-            req.open('POST', 'http://auth.codecommerce.de/oauth/v2/token');
-            req.setRequestHeader('Content-Type', 'application/x-www-form-urlencoded');
-
-            req.onload = function() {
-                // This is called even on 404 etc
-                // so check the status
-                if (req.status == 200) {
-                    // Resolve the promise with the response text
-                    resolve(req.response);
-                }
-                else {
-                    // Otherwise reject with the status text
-                    // which will hopefully be a meaningful error
-                    reject(Error(req.statusText));
-                }
-            };
-
-            // Handle network errors
-            req.onerror = function() {
-                reject(Error("Network Error"));
-            };
-
-            // Make the request
-            req.send(urlEncodedData);
         });
     };
+
 
     app.sendTokenToServer = function(token)
     {
@@ -85,29 +80,32 @@
 
     app.sendToServer = function(data, method, url, success, error)
     {
-        var XHR = new XMLHttpRequest();
-        var urlEncodedData = "";
-        var urlEncodedDataPairs = [];
-        var name;
+        app.getAccessToken()
+            .then(function(accessToken) {
+                var XHR = new XMLHttpRequest();
+                var urlEncodedData = "";
+                var urlEncodedDataPairs = [];
+                var name;
+                for(name in data) {
+                    urlEncodedDataPairs.push(encodeURIComponent(name) + '=' + encodeURIComponent(data[name]));
+                }
+                urlEncodedData = urlEncodedDataPairs.join('&').replace(/%20/g, '+');
 
-        var accessToken = app.getAccessToken();
+                if (typeof success != 'undefined' && success) {
+                    XHR.addEventListener('load', success);
+                }
 
-        for(name in data) {
-            urlEncodedDataPairs.push(encodeURIComponent(name) + '=' + encodeURIComponent(data[name]));
-        }
-        urlEncodedData = urlEncodedDataPairs.join('&').replace(/%20/g, '+');
+                if (typeof error != 'undefined' && error) {
+                    XHR.addEventListener('error', error);
+                }
 
-        if (typeof success != 'undefined' && success) {
-            XHR.addEventListener('load', success);
-        }
+                XHR.open(method, url);
+                XHR.setRequestHeader('Content-Type', 'application/x-www-form-urlencoded');
+                XHR.setRequestHeader("Authorization", "Bearer " + accessToken);
 
-        if (typeof error != 'undefined' && error) {
-            XHR.addEventListener('error', error);
-        }
+                XHR.send(urlEncodedData);
+            });
 
-        XHR.open(method, url);
-        XHR.setRequestHeader('Content-Type', 'application/x-www-form-urlencoded');
-        XHR.send(urlEncodedData);
     };
 
 
@@ -161,12 +159,6 @@
 
     let isSubscribed = false;
     let swRegistration = null;
-
-
-
-
-
-
 
 
 
