@@ -202,9 +202,11 @@
                 console.error('Service Worker Error', error);
             });
 
-        navigator.serviceWorker.addEventListener('message', event => {
-            console.log(event.data.msg, event.data.url);
-    });
+        navigator.serviceWorker.addEventListener('message', function(event) {
+
+            console.log(event.data);
+
+        });
     } else {
         console.warn('Push messaging is not supported');
         pushButton.textContent = 'Push Not Supported';
