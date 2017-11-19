@@ -1,3 +1,5 @@
+
+
 (function () {
 
     'use strict';
@@ -5,11 +7,33 @@
     const pushButton = document.querySelector('.js-push-btn');
     const messaging = firebase.messaging();
 
+    /*jQuery(window).on('pushReceived', function(event) {
+        console.log(event);
+    });*/
+
     var app = {
+        user: '',
         accessToken: {
             accessToken: '',
             validTill: 0
         }
+    };
+
+    app.showScreen = function(name)
+    {
+        jQuery('article').hide();
+        jQuery('article#' + name).show();
+
+    };
+
+
+    app.onLoginSubmit = function(event)
+    {
+        var username = jQuery('.login form #inputEmail').val();
+        app.user = username;
+        jQuery('.login form input').attr('disable', 'disable');
+
+        return false;
     };
 
     app.getAccessToken = function()
@@ -66,7 +90,6 @@
             }
         });
     };
-
 
     app.sendTokenToServer = function(token)
     {
@@ -136,7 +159,6 @@
         })
         .catch(function (err) {
             console.log('An error occurred while retrieving token. ', err);
-            showToken('Error retrieving Instance ID token. ', err);
             setTokenSentToServer(false);
         });
 
@@ -162,6 +184,8 @@
 
 
 
+    jQuery('.login form').submit(app.onLoginSubmit());
+
     if ('serviceWorker' in navigator && 'PushManager' in window) {
         console.log('Service Worker and Push is supported');
 
@@ -170,11 +194,17 @@
                 console.log('Service Worker is registered', swReg);
                 swRegistration = swReg;
                 messaging.useServiceWorker(swRegistration);
+
+
                 //initializeUI();
             })
             .catch(function (error) {
                 console.error('Service Worker Error', error);
             });
+
+        navigator.serviceWorker.addEventListener('message', event => {
+            console.log(event.data.msg, event.data.url);
+    });
     } else {
         console.warn('Push messaging is not supported');
         pushButton.textContent = 'Push Not Supported';
