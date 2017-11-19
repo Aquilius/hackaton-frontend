@@ -194,9 +194,6 @@
                 console.log('Service Worker is registered', swReg);
                 swRegistration = swReg;
                 messaging.useServiceWorker(swRegistration);
-
-
-                //initializeUI();
             })
             .catch(function (error) {
                 console.error('Service Worker Error', error);
